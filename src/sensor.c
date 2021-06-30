@@ -42,48 +42,32 @@ int conexionSocket(int puerto, const char *buffers)
     struct sockaddr_in direccion_destino;
 
     memset(&direccion_destino, 0, sizeof(direccion_destino)); //ponemos en 0 la estructura direccion_servidor
-
     //llenamos los campos
     direccion_destino.sin_family = AF_INET;                     //IPv4
     direccion_destino.sin_port = htons(puerto);                 //Convertimos el numero de puerto al endianness de la red
     direccion_destino.sin_addr.s_addr = inet_addr("127.0.0.1"); //Nos vinculamos a la interface localhost o podemos usar INADDR_ANY para ligarnos A TODAS las interfaces
-
     int fd;
-
     if ((fd = socket(direccion_destino.sin_family, SOCK_STREAM, 0)) < 0)
     {
         printf("Error al crear socket\n");
         return -1;
-    }
+    };
 
     int res = connect(fd, (struct sockaddr *)&direccion_destino, sizeof(direccion_destino));
-
     if (res < 0)
     {
-        close(fd);
         printf("Error al conectar\n");
-        return -1;
     }
     else
     {
         printf("Conectado\n");
-        while (1)
-        {
-            char info[100];
-            crearInformacion(buffers, info);
-            int bytesescritos;
-            printf("%s\n", info);
-            if ((bytesescritos = write(res, info, 100)) < 0)
-            {
-                perror("Error al escribir archivo localmente\n");
-            }
-            else
-            {
-                printf("Dato enviado correctamente\n");
-            }
-            usleep(3000);
-            /* code */
-        }
+    }
+    while (1)
+    {
+        int n = 0;
+        char info[100];
+        crearInformacion(buffers, info);
+        n = write(fd, info, 100);
     }
 
     return 0;

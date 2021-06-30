@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/resource.h>
+#include <pthread.h>
 
 #define BUFLEN 128
 #define QLEN 10
@@ -36,6 +37,36 @@ int main(int argc, char const *argv[])
     inicializarServidor(port);
 
     return 0;
+}
+
+struct SensorPaquete
+{
+    int fd;
+};
+
+void *
+manejandoConexion(void *arg)
+{
+    struct SensorPaquete *var = (struct SensorPaquete *)arg;
+    int n;
+    printf("Numero conexion exitosa %d\n", var->fd);
+    while (1)
+    {
+
+        char buf[100]; //16
+        n = read(var->fd, buf, sizeof(buf));
+        if (n == 0)
+        {
+            printf("The Client %d closed!\n", var->fd);
+            break;
+        }
+        else
+        {
+            printf("%s\n", buf);
+        }
+    }
+    close(var->fd);
+    return NULL;
 }
 
 void inicializarServidor(int port)
@@ -69,32 +100,25 @@ void inicializarServidor(int port)
     {
         printf("Servidor escuchando en puerto %d \n", port);
     }
+    pthread_t tid;
+    struct SensorPaquete ts[128];
+    int i = 0;
+
     while (1)
     {
         int sockfd_conectado = accept(fd, NULL, 0);
         if (sockfd_conectado > 0)
         {
             printf("%s", "Conexion exitosa con cliente\n");
+            ts[i].fd = sockfd_conectado;
+            pthread_create(&tid, NULL, manejandoConexion, (void *)&ts[i]);
+
+            pthread_detach(tid); //Separate thread separation to prevent stiff threads from being generated
+            i++;
         }
         else
         {
             printf("%s", "Error de conexion\n");
-        }
-        //TODO: ...
-        while (1)
-        {
-            char buf_ruta_recibida[100];
-
-            int lec_ruta_recibida = read(sockfd_conectado, buf_ruta_recibida, 100);
-            if (lec_ruta_recibida < 0)
-            {
-                printf("Error al leer\n");
-            }
-            else
-            {
-
-                printf("%s\n", buf_ruta_recibida);
-            }
         }
     }
 }
