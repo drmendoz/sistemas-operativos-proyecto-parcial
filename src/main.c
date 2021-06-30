@@ -16,24 +16,32 @@
 #include <arpa/inet.h>
 #include <sys/resource.h>
 #include <pthread.h>
+#include "processor.h"
 
 #define BUFLEN 128
-#define QLEN 10
 
-#ifndef HOST_NAME_MAX
-#define HOST_NAME_MAX 256
-#endif
+#define NUM_BUFF 100
 
 #define QUEUESIZE 1
 
+Buffer *buffs[NUM_BUFF];
+Processor *procs[NUM_BUFF];
 void decodificarMensajeSensor(char *mensaje);
 
 void inicializarServidor(int port);
 
+void inicializandoBuffers();
+void inicializandoProcessors();
+
 int main(int argc, char const *argv[])
 {
     const int port = atoi(argv[1]);
-
+    const int frecuencia = atoi(argv[2]);
+    inicializandoBuffers();
+    /*
+    
+    inicializandoProcessors(frecuencia);
+    */
     inicializarServidor(port);
 
     return 0;
@@ -43,6 +51,22 @@ struct SensorPaquete
 {
     int fd;
 };
+
+void inicializandoProcessors(int frecuencia)
+{
+    for (int i = 0; i < NUM_BUFF; i++)
+    {
+        inicializarProcessor(procs[i], frecuencia, buffs[i]);
+    }
+}
+
+void inicializandoBuffers()
+{
+    for (int i = 0; i < NUM_BUFF; i++)
+    {
+        inicializarBuffer(buffs[i]);
+    }
+}
 
 void *
 manejandoConexion(void *arg)

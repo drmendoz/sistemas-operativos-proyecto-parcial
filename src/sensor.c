@@ -68,6 +68,7 @@ int conexionSocket(int puerto, const char *buffers)
         char info[100];
         crearInformacion(buffers, info);
         n = write(fd, info, 100);
+        sleep(5);
     }
 
     return 0;

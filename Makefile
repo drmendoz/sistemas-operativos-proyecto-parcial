@@ -1,11 +1,19 @@
 CC=gcc
 CFLOBJ=-Wall -c -Iinclude/ -o
 EXE=bin/framework
-$(EXE): obj/main.o 
+
+
+$(EXE): obj/main.o obj/processor.o obj/buffer.o 
 	$(CC) -o  $@ $^
 
 obj/main.o: src/main.c
 	$(CC) $(CFLOBJ) $@  $^
+
+obj/processor.o: src/processor.c
+	$(CC) -o $(CFLOBJ) $@ $^
+
+obj/buffer.o: src/buffer.c
+	$(CC) -o $(CFLOBJ) $@ $^
 
 sensor: obj/sensor.o
 	$(CC) -o bin/$@ $^
