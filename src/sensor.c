@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <arpa/inet.h>
-
+#include <pthread.h>
 #define BUFLEN 128
 #define QLEN 10
 
@@ -18,7 +18,8 @@
 
 void crearInformacion(const char *buffers, char *info);
 int gettRandom(int lower, int upper);
-int conexionSocket(int puerto, const char *buffers);
+void conexionSocket(int puerto, const char *buffers);
+void solicitarComandos(void *args);
 
 int main(int argc, char const *argv[])
 {
@@ -27,8 +28,11 @@ int main(int argc, char const *argv[])
         fprintf(stderr, "Se necesita dos argumentos\n");
         return -1;
     }
+    pthread_t id[2];
     const char *buffers = argv[1];
     const int port = atoi(argv[2]);
+    pthread_create(&id[0], NULL, solicitarComandos, NULL);
+    //pthread_create(&id[0], NULL, printNumber, &arg);
     int error = conexionSocket(port, buffers);
     if (error < 0)
     {
@@ -37,7 +41,11 @@ int main(int argc, char const *argv[])
     return 0;
 }
 
-int conexionSocket(int puerto, const char *buffers)
+void solicitarComandos(void *args)
+{
+}
+
+void conexionSocket(int puerto, const char *buffers)
 {
     struct sockaddr_in direccion_destino;
 

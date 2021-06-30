@@ -2,39 +2,61 @@
 #include <pthread.h>
 #include "buffer.h"
 #include <stdlib.h>
-void inicializarBuffer(Buffer *buffer)
+Buffer *inicializarBuffer()
 {
-    buffer = (Buffer *)malloc(sizeof(buffer));
-    pthread_mutex_init(buffer->sem, NULL);
+    Buffer *buffer = (Buffer *)malloc(sizeof(*buffer));
+    if (pthread_mutex_init(&(buffer->sem), NULL) != 0)
+    {
+        printf("Error al iniciar semaforo\n");
+    }
+    /*  for (size_t i = 0; i < BUFF_SIZE; i++)
+    {
+        buffer->valores[i] = (ValorSensor *)malloc(sizeof(ValorSensor));
+    }
+*/
+    return buffer;
 }
 
 void anadirValorBuffer(Buffer *buffer, time_t hora, int valor)
 {
-    pthread_mutex_lock(buffer->sem);
+    pthread_mutex_lock(&(buffer->sem));
     for (int i = 0; i < BUFF_SIZE; i++)
     {
-        if (buffer->valores[i] != NULL)
+        if (buffer->valores[i] == NULL || i == BUFF_SIZE - 1)
         {
-            buffer->valores[i]->hora = hora;
-            buffer->valores[i]->valor = valor;
+            struct ValorSensor *valorSensor = malloc(sizeof *valorSensor);
+            valorSensor->hora = hora;
+            valorSensor->valor = valor;
+            buffer->valores[i] = valorSensor;
+            break;
         }
     }
-    pthread_mutex_unlock(buffer->sem);
+    pthread_mutex_unlock(&(buffer->sem));
 }
 
 int obtenerValores(Buffer *buffer)
 {
-    int prom, sum, cont = 0;
-    pthread_mutex_lock(buffer->sem);
-    for (size_t i = 0; i < BUFF_SIZE; i++)
+    int prom = 0;
+    int sum = 0;
+    int cont = 0;
+    pthread_mutex_lock(&(buffer->sem));
+    for (int i = 0; i < BUFF_SIZE; i++)
     {
         if (buffer->valores[i] != NULL)
         {
+            printf("Entre al if");
             sum += buffer->valores[i]->valor;
             cont += 1;
+
+            free(buffer->valores[i]);
         }
     }
-    pthread_mutex_unlock(buffer->sem);
+    if (cont == 0)
+    {
+        cont = 1;
+    }
+
+    pthread_mutex_unlock(&(buffer->sem));
     prom = sum / cont;
     return prom;
 }

@@ -2,7 +2,7 @@
 #include <pthread.h>
 #include <time.h>
 
-#define BUFF_SIZE 100
+#define BUFF_SIZE 20
 
 typedef struct ValorSensor
 {
@@ -12,11 +12,11 @@ typedef struct ValorSensor
 
 typedef struct Buffer
 {
-    pthread_mutex_t *sem;
+    pthread_mutex_t sem;
     ValorSensor *valores[BUFF_SIZE];
 } Buffer;
 
-void inicializarBuffer(Buffer *buffer);
+Buffer *inicializarBuffer();
 
 int obtenerValores(Buffer *buffer);
 

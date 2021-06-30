@@ -3,17 +3,24 @@
 
 void inicializarProcessor(Processor *processor, int tiempo, Buffer *buffer)
 {
+    processor = (Processor *)malloc(sizeof(processor));
     processor->frecuencia = tiempo;
     processor->buffer = buffer;
+
+    pthread_t tid;
+    pthread_create(&tid, NULL, processorWork, (void *)processor);
+
+    pthread_detach(tid); //Separate thread separation to prevent stiff threads from being generated
 }
 
-void *proccesorWork(void *arg)
+void *processorWork(void *arg)
 {
     struct Processor *proc = (struct Processor *)arg;
     while (1)
     {
         int resultado = obtenerValores(proc->buffer);
-        printf("%d", resultado);
         sleep(proc->frecuencia);
     }
+
+    return NULL;
 }

@@ -17,10 +17,11 @@
 #include <sys/resource.h>
 #include <pthread.h>
 #include "processor.h"
+#include "log.h"
 
 #define BUFLEN 128
 
-#define NUM_BUFF 100
+#define NUM_BUFF 10
 
 #define QUEUESIZE 1
 
@@ -33,17 +34,42 @@ void inicializarServidor(int port);
 void inicializandoBuffers();
 void inicializandoProcessors();
 
+void decodificarMensajeSensor(char *mensaje)
+{
+    char str[] = "strtok needs to be called several times to split a string";
+    int init_size = strlen(str);
+    char delim[] = " ";
+
+    char *ptr = strtok(str, delim);
+
+    while (ptr != NULL)
+    {
+        printf("'%s'\n", ptr);
+        ptr = strtok(NULL, delim);
+    }
+
+    /* This loop will show that there are zeroes in the str after tokenizing */
+    for (int i = 0; i < init_size; i++)
+    {
+        printf("%d ", str[i]); /* Convert the character to integer, in this case
+							   the character's ASCII equivalent */
+    }
+    printf("\n");
+}
+
 int main(int argc, char const *argv[])
 {
     const int port = atoi(argv[1]);
     const int frecuencia = atoi(argv[2]);
-    inicializandoBuffers();
-    /*
-    
-    inicializandoProcessors(frecuencia);
-    */
-    inicializarServidor(port);
+    const char *modo = argv[3];
+    inicializarLog(modo);
+    escribirLog("hola");
+    /*inicializandoBuffers();
 
+    inicializandoProcessors(frecuencia);
+
+    inicializarServidor(port);
+*/
     return 0;
 }
 
@@ -64,7 +90,7 @@ void inicializandoBuffers()
 {
     for (int i = 0; i < NUM_BUFF; i++)
     {
-        inicializarBuffer(buffs[i]);
+        buffs[i] = inicializarBuffer(buffs[i]);
     }
 }
 
@@ -86,6 +112,7 @@ manejandoConexion(void *arg)
         }
         else
         {
+            decodificarMensajeSensor(buf);
             printf("%s\n", buf);
         }
     }
@@ -144,22 +171,5 @@ void inicializarServidor(int port)
         {
             printf("%s", "Error de conexion\n");
         }
-    }
-}
-
-void decodificarMensajeSensor(char *mensaje)
-{
-    char **menArray = NULL;
-    char *str = strtok(mensaje, ",");
-    int cont = 0;
-    while (str != NULL)
-    {
-        *(menArray + cont) = str;
-        printf("%s", str);
-        str = strtok(mensaje, ",");
-    }
-    if (cont > 2)
-    {
-        printf("%s", "Error en formato de mensaje\n");
     }
 }

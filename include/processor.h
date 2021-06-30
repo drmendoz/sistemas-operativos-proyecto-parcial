@@ -15,4 +15,4 @@ typedef struct Processor
 
 void inicializarProcessor(Processor *processor, int tiempo, Buffer *buffer);
 
-void *proccesorWork(void *arg);
+void *processorWork(void *arg);
