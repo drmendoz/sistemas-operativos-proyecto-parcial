@@ -17,7 +17,7 @@
 #define QUEUESIZE 10
 
 void crearInformacion(const char *buffers, char *info);
-int gettRandom(int lower, int upper);
+int getRandom(int lower, int upper);
 void *conexionSocket(void *args);
 void *solicitarComandos(void *args);
 
