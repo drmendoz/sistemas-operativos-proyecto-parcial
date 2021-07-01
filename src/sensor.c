@@ -116,5 +116,5 @@ void crearInformacion(const char *buffers, char *info)
     seconds = time(NULL);
 
     int numeroAleatorio = getRandom(0, 255);
-    sprintf(info, "%s,%d,%ld", buffers, numeroAleatorio, seconds);
+    sprintf(info, "%s %d %ld", buffers, numeroAleatorio, seconds);
 }

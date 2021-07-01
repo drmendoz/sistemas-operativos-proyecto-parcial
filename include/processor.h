@@ -13,6 +13,6 @@ typedef struct Processor
     int frecuencia;
 } Processor;
 
-void inicializarProcessor(Processor *processor, int tiempo, Buffer *buffer);
+void inicializarProcessor(Processor *processor, int id, int tiempo, Buffer *buffer);
 
 void *processorWork(void *arg);

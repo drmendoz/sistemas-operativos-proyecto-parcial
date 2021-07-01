@@ -2,9 +2,10 @@
 #include <pthread.h>
 #include "buffer.h"
 #include <stdlib.h>
-Buffer *inicializarBuffer()
+Buffer *inicializarBuffer(int id)
 {
     Buffer *buffer = (Buffer *)malloc(sizeof(*buffer));
+    buffer->id = id;
     if (pthread_mutex_init(&(buffer->sem), NULL) != 0)
     {
         printf("Error al iniciar semaforo\n");
@@ -17,7 +18,7 @@ Buffer *inicializarBuffer()
     return buffer;
 }
 
-void anadirValorBuffer(Buffer *buffer, time_t hora, int valor)
+void anadirValorBuffer(Buffer *buffer, char *hora, int valor)
 {
     pthread_mutex_lock(&(buffer->sem));
     for (int i = 0; i < BUFF_SIZE; i++)

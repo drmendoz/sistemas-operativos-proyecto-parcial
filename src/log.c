@@ -3,7 +3,7 @@
 
 char *modo = "r";
 
-void inicializarLog(const char *log_mode)
+void inicializarLog(char *log_mode)
 {
     if (log_mode != NULL)
     {
@@ -15,6 +15,7 @@ void inicializarLog(const char *log_mode)
         openlog("rover", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
     }
 }
+
 void escribirLog(char *mensaje)
 {
     if (strcmp(modo, "d") == 0)

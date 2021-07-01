@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include "processor.h"
 
-void inicializarProcessor(Processor *processor, int tiempo, Buffer *buffer)
+void inicializarProcessor(Processor *processor, int id, int tiempo, Buffer *buffer)
 {
     processor = (Processor *)malloc(sizeof(processor));
+    processor->id = id;
     processor->frecuencia = tiempo;
     processor->buffer = buffer;
 

@@ -34,42 +34,60 @@ void inicializarServidor(int port);
 void inicializandoBuffers();
 void inicializandoProcessors();
 
-void decodificarMensajeSensor(char *mensaje)
+void decodificarMensajeSensor(char *str)
 {
-    char str[] = "strtok needs to be called several times to split a string";
-    int init_size = strlen(str);
-    char delim[] = " ";
 
+    char delim[] = " ";
     char *ptr = strtok(str, delim);
 
-    while (ptr != NULL)
-    {
-        printf("'%s'\n", ptr);
-        ptr = strtok(NULL, delim);
-    }
+    char *primeritem = ptr;
+    ptr = strtok(NULL, delim);
+    char valor[3];
+    strcpy(valor, ptr);
+    ptr = strtok(NULL, delim);
+    char tiempo[60];
+    strcpy(tiempo, ptr);
+    // haciendo el array del primer elemento
+    int i = 0;
+    char *p = strtok(primeritem, ",");
+    char *array[100];
 
-    /* This loop will show that there are zeroes in the str after tokenizing */
-    for (int i = 0; i < init_size; i++)
+    while (p != NULL)
     {
-        printf("%d ", str[i]); /* Convert the character to integer, in this case
-							   the character's ASCII equivalent */
+        printf("%s", p);
+        int bufferId = atoi(p);
+        if (bufferId < 0 || bufferId > NUM_BUFF)
+        {
+            escribirLog("No existe buffer");
+        }
+        else
+        {
+            for (int j = 0; j < NUM_BUFF; j++)
+            {
+                Buffer *buff = buffs[j];
+                if (buff->id == j)
+                {
+                    anadirValorBuffer(buff, tiempo, atoi(valor));
+                }
+            }
+        }
+        array[i++] = p;
+        p = strtok(NULL, ",");
     }
-    printf("\n");
 }
 
 int main(int argc, char const *argv[])
 {
     const int port = atoi(argv[1]);
     const int frecuencia = atoi(argv[2]);
-    const char *modo = argv[3];
+    char *modo = (char *)argv[3];
     inicializarLog(modo);
-    escribirLog("hola");
-    /*inicializandoBuffers();
+    inicializandoBuffers();
 
     inicializandoProcessors(frecuencia);
 
     inicializarServidor(port);
-*/
+
     return 0;
 }
 
@@ -82,7 +100,7 @@ void inicializandoProcessors(int frecuencia)
 {
     for (int i = 0; i < NUM_BUFF; i++)
     {
-        inicializarProcessor(procs[i], frecuencia, buffs[i]);
+        inicializarProcessor(procs[i], i, frecuencia, buffs[i]);
     }
 }
 
@@ -90,7 +108,7 @@ void inicializandoBuffers()
 {
     for (int i = 0; i < NUM_BUFF; i++)
     {
-        buffs[i] = inicializarBuffer(buffs[i]);
+        buffs[i] = inicializarBuffer(i);
     }
 }
 
@@ -112,8 +130,8 @@ manejandoConexion(void *arg)
         }
         else
         {
+            printf("%s", buf);
             decodificarMensajeSensor(buf);
-            printf("%s\n", buf);
         }
     }
     close(var->fd);

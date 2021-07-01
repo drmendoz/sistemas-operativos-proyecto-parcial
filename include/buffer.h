@@ -7,17 +7,18 @@
 typedef struct ValorSensor
 {
     int valor;
-    time_t hora;
+    char *hora;
 } ValorSensor;
 
 typedef struct Buffer
 {
+    int id;
     pthread_mutex_t sem;
     ValorSensor *valores[BUFF_SIZE];
 } Buffer;
 
-Buffer *inicializarBuffer();
+Buffer *inicializarBuffer(int id);
 
 int obtenerValores(Buffer *buffer);
 
-void anadirValorBuffer(Buffer *buffer, time_t hora, int valor);
+void anadirValorBuffer(Buffer *buffer, char *hora, int valor);
