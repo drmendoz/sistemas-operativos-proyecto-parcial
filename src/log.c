@@ -25,6 +25,6 @@ void escribirLog(char *mensaje)
     }
     else
     {
-        printf("%s", mensaje);
+        printf("%s\n", mensaje);
     }
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "processor.h"
+#include "log.h"
 
 void inicializarProcessor(Processor *processor, int id, int tiempo, Buffer *buffer)
 {
@@ -20,7 +21,9 @@ void *processorWork(void *arg)
     while (1)
     {
         int resultado = obtenerValores(proc->buffer);
-        printf("Resultado de buffer %d es %d\n", proc->buffer->id, resultado);
+        char info[100];
+        sprintf(info, "Resultado de buffer %d es %d", proc->buffer->id, resultado);
+        escribirLog(info);
         sleep(proc->frecuencia);
     }
 

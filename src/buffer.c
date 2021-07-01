@@ -45,11 +45,8 @@ int obtenerValores(Buffer *buffer)
     {
         if (buffer->valores[i] != NULL)
         {
-            printf("%d", buffer->valores[i]->valor);
             sum += buffer->valores[i]->valor;
             cont += 1;
-
-            free(buffer->valores[i]);
         }
     }
     if (cont == 0)

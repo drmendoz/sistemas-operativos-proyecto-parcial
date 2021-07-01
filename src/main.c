@@ -27,14 +27,14 @@
 
 Buffer *buffs[NUM_BUFF];
 Processor *procs[NUM_BUFF];
-void decodificarMensajeSensor(char *mensaje);
+void decodificarMensajeSensor(char *mensaje, int idSensor);
 
 void inicializarServidor(int port);
 
 void inicializandoBuffers();
 void inicializandoProcessors();
 
-void decodificarMensajeSensor(char *str)
+void decodificarMensajeSensor(char *str, int idSensor)
 {
 
     char delim[] = " ";
@@ -49,8 +49,8 @@ void decodificarMensajeSensor(char *str)
     char tiempo[100];
     strcpy(tiempo, ptr);
     char info[100];
-    sprintf(info, "Buffers: %s, Tiempo: %s, Valor: %s ", primeritem, tiempo, valor);
-    printf("%s", info);
+    sprintf(info, "Sensor ID: %d,Buffers: %s, Tiempo: %s, Valor: %s ", idSensor, primeritem, tiempo, valor);
+    escribirLog(info);
     // haciendo el array del primer elemento
     int i = 0;
     char *p = strtok(primeritem, ",");
@@ -67,7 +67,7 @@ void decodificarMensajeSensor(char *str)
             for (int j = 0; j < NUM_BUFF; j++)
             {
                 Buffer *buff = buffs[j];
-                if (buff->id == j)
+                if (buff->id == bufferId)
                 {
 
                     anadirValorBuffer(buff, tiempo, atoi(valor));
@@ -134,8 +134,7 @@ manejandoConexion(void *arg)
         }
         else
         {
-            printf("%s\n", buf);
-            decodificarMensajeSensor(buf);
+            decodificarMensajeSensor(buf, var->fd);
         }
     }
     close(var->fd);
@@ -157,21 +156,26 @@ void inicializarServidor(int port)
 
     if ((fd = socket(direccion_servidor.sin_family, SOCK_STREAM, 0)) < 0)
     {
-        printf("Error al crear socket\n");
+        escribirLog("Error al crear socket\n");
+        exit(-1);
     }
 
     if (bind(fd, (struct sockaddr *)&direccion_servidor, sizeof(direccion_servidor)) < 0)
     {
-        printf("Error en bind\n");
+        escribirLog("Error en bind\n");
+        exit(-1);
     }
 
     if (listen(fd, QUEUESIZE) < 0)
     {
-        printf("Error en listen\n");
+        escribirLog("Error en listen\n");
+        exit(-1);
     }
     else
     {
-        printf("Servidor escuchando en puerto %d \n", port);
+        char info[100];
+        sprintf(info, "Servidor escuchando en puerto %d \n", port);
+        escribirLog(info);
     }
     pthread_t tid;
     struct SensorPaquete ts[128];
