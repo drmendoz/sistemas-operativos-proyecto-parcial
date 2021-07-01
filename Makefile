@@ -18,8 +18,6 @@ obj/buffer.o: src/buffer.c
 obj/log.o: src/log.c
 	$(CC) -o $(CFLOBJ) $@ $^
 
-
-
 sensor: obj/sensor.o
 	$(CC) -o bin/$@ $^
 
