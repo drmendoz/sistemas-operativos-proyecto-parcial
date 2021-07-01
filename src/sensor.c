@@ -96,6 +96,10 @@ void *conexionSocket(void *args)
             char info[100];
             crearInformacion(var->buffers, info);
             n = write(fd, info, 100);
+            if (n < 0)
+            {
+                printf("Error de conexion con framework");
+            }
             sleep(5);
         }
     }

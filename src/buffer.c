@@ -25,7 +25,7 @@ void anadirValorBuffer(Buffer *buffer, char *hora, int valor)
     {
         if (buffer->valores[i] == NULL || i == BUFF_SIZE - 1)
         {
-            struct ValorSensor *valorSensor = malloc(sizeof *valorSensor);
+            struct ValorSensor *valorSensor = malloc(sizeof(*valorSensor));
             valorSensor->hora = hora;
             valorSensor->valor = valor;
             buffer->valores[i] = valorSensor;
@@ -45,7 +45,7 @@ int obtenerValores(Buffer *buffer)
     {
         if (buffer->valores[i] != NULL)
         {
-            printf("Entre al if");
+            printf("%d", buffer->valores[i]->valor);
             sum += buffer->valores[i]->valor;
             cont += 1;
 

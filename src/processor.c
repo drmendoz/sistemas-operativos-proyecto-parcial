@@ -3,7 +3,7 @@
 
 void inicializarProcessor(Processor *processor, int id, int tiempo, Buffer *buffer)
 {
-    processor = (Processor *)malloc(sizeof(processor));
+    processor = (Processor *)malloc(sizeof(*processor));
     processor->id = id;
     processor->frecuencia = tiempo;
     processor->buffer = buffer;
@@ -20,6 +20,7 @@ void *processorWork(void *arg)
     while (1)
     {
         int resultado = obtenerValores(proc->buffer);
+        printf("Resultado de buffer %d es %d\n", proc->buffer->id, resultado);
         sleep(proc->frecuencia);
     }
 

@@ -42,19 +42,21 @@ void decodificarMensajeSensor(char *str)
 
     char *primeritem = ptr;
     ptr = strtok(NULL, delim);
-    char valor[3];
+    char valor[100];
+
     strcpy(valor, ptr);
     ptr = strtok(NULL, delim);
-    char tiempo[60];
+    char tiempo[100];
     strcpy(tiempo, ptr);
+    char info[100];
+    sprintf(info, "Buffers: %s, Tiempo: %s, Valor: %s ", primeritem, tiempo, valor);
+    printf("%s", info);
     // haciendo el array del primer elemento
     int i = 0;
     char *p = strtok(primeritem, ",");
     char *array[100];
-
     while (p != NULL)
     {
-        printf("%s", p);
         int bufferId = atoi(p);
         if (bufferId < 0 || bufferId > NUM_BUFF)
         {
@@ -67,7 +69,9 @@ void decodificarMensajeSensor(char *str)
                 Buffer *buff = buffs[j];
                 if (buff->id == j)
                 {
+
                     anadirValorBuffer(buff, tiempo, atoi(valor));
+                    break;
                 }
             }
         }
@@ -130,7 +134,7 @@ manejandoConexion(void *arg)
         }
         else
         {
-            printf("%s", buf);
+            printf("%s\n", buf);
             decodificarMensajeSensor(buf);
         }
     }
