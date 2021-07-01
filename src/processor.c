@@ -12,7 +12,7 @@ void inicializarProcessor(Processor *processor, int id, int tiempo, Buffer *buff
     pthread_t tid;
     pthread_create(&tid, NULL, processorWork, (void *)processor);
 
-    pthread_detach(tid); //Separate thread separation to prevent stiff threads from being generated
+    pthread_detach(tid);
 }
 
 void *processorWork(void *arg)

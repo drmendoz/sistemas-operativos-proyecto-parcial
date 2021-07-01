@@ -1,10 +1,10 @@
 CC=gcc
-CFLOBJ=-Wall -lpthread -c -Iinclude/ -o
+CFLOBJ=-Wall -c -Iinclude/ -o
 EXE=bin/framework
 
 
 $(EXE): obj/main.o obj/processor.o obj/buffer.o obj/log.o
-	$(CC) -o  $@ $^
+	$(CC) -o  $@ $^ -lpthread
 
 obj/main.o: src/main.c
 	$(CC) $(CFLOBJ) $@  $^
@@ -19,7 +19,7 @@ obj/log.o: src/log.c
 	$(CC) -o $(CFLOBJ) $@ $^
 
 sensor: obj/sensor.o
-	$(CC) -o bin/$@ $^
+	$(CC) -o bin/$@ $^ -lpthread
 
 obj/sensor.o: src/sensor.c
 	$(CC) -o $(CFLOBJ) $@ $^

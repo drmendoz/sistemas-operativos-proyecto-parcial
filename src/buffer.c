@@ -10,11 +10,7 @@ Buffer *inicializarBuffer(int id)
     {
         printf("Error al iniciar semaforo\n");
     }
-    /*  for (size_t i = 0; i < BUFF_SIZE; i++)
-    {
-        buffer->valores[i] = (ValorSensor *)malloc(sizeof(ValorSensor));
-    }
-*/
+
     return buffer;
 }
 
