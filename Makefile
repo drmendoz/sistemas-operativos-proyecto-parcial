@@ -1,5 +1,5 @@
 CC=gcc
-CFLOBJ=-Wall -c -Iinclude/ -o
+CFLOBJ=-Wall -lpthread -c -Iinclude/ -o
 EXE=bin/framework
 
 
