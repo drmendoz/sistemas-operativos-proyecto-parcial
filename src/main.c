@@ -21,7 +21,7 @@
 
 #define BUFLEN 128
 
-#define NUM_BUFF 10
+#define NUM_BUFF 20
 
 #define QUEUESIZE 1
 
@@ -34,6 +34,23 @@ void inicializarServidor(int port);
 void inicializandoBuffers();
 void inicializandoProcessors();
 
+void RemoveChars(char *s, char c)
+{
+    int writer = 0, reader = 0;
+
+    while (s[reader])
+    {
+        if (s[reader] != c)
+        {
+            s[writer++] = s[reader];
+        }
+
+        reader++;
+    }
+
+    s[writer] = 0;
+}
+
 void decodificarMensajeSensor(char *str, int idSensor)
 {
 
@@ -41,23 +58,28 @@ void decodificarMensajeSensor(char *str, int idSensor)
     char *ptr = strtok(str, delim);
 
     char *primeritem = ptr;
+
     ptr = strtok(NULL, delim);
     char valor[100];
 
     strcpy(valor, ptr);
     ptr = strtok(NULL, delim);
-    char tiempo[100];
+    char tiempo[300];
     strcpy(tiempo, ptr);
     char info[100];
     sprintf(info, "Sensor ID: %d,Buffers: %s, Tiempo: %s, Valor: %s ", idSensor, primeritem, tiempo, valor);
     escribirLog(info);
     // haciendo el array del primer elemento
+    RemoveChars(primeritem, '[');
+    RemoveChars(primeritem, ']');
     int i = 0;
     char *p = strtok(primeritem, ",");
+
     char *array[100];
     while (p != NULL)
     {
         int bufferId = atoi(p);
+        array[i++] = p;
         if (bufferId < 0 || bufferId > NUM_BUFF)
         {
             escribirLog("No existe buffer");
@@ -75,7 +97,6 @@ void decodificarMensajeSensor(char *str, int idSensor)
                 }
             }
         }
-        array[i++] = p;
         p = strtok(NULL, ",");
     }
 }
@@ -121,7 +142,7 @@ manejandoConexion(void *arg)
 {
     struct SensorPaquete *var = (struct SensorPaquete *)arg;
     int n;
-    printf("Numero conexion exitosa %d\n", var->fd);
+    printf("Sensor con ID %d se ha conectado exitosamente\n", var->fd);
     while (1)
     {
 
@@ -129,7 +150,7 @@ manejandoConexion(void *arg)
         n = read(var->fd, buf, sizeof(buf));
         if (n == 0)
         {
-            printf("The Client %d closed!\n", var->fd);
+            printf("Sensor %d ha cerrado su conexion exitosamente\n", var->fd);
             break;
         }
         else
@@ -147,7 +168,6 @@ void inicializarServidor(int port)
 
     memset(&direccion_servidor, 0, sizeof(direccion_servidor)); //ponemos en 0 la estructura direccion_servidor
 
-    //llenamos los campos
     direccion_servidor.sin_family = AF_INET;                     //IPv4
     direccion_servidor.sin_port = htons(port);                   //Convertimos el numero de puerto al endianness de la red
     direccion_servidor.sin_addr.s_addr = inet_addr("127.0.0.1"); //Nos vinculamos a la interface localhost o podemos usar INADDR_ANY para ligarnos A TODAS las interfaces

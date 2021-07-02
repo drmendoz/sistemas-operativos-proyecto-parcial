@@ -22,8 +22,11 @@ void *processorWork(void *arg)
     {
         int resultado = obtenerValores(proc->buffer);
         char info[100];
-        sprintf(info, "Resultado de buffer %d es %d", proc->buffer->id, resultado);
-        escribirLog(info);
+        if (resultado > 0)
+        {
+            sprintf(info, "El promedio del buffer %d es %d", proc->buffer->id, resultado);
+            escribirLog(info);
+        }
         sleep(proc->frecuencia);
     }
 

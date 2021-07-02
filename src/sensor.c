@@ -7,6 +7,7 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include "log.h"
 #define BUFLEN 128
 #define QLEN 10
 
@@ -20,15 +21,43 @@ void crearInformacion(const char *buffers, char *info);
 int getRandom(int lower, int upper);
 void *conexionSocket(void *args);
 void *solicitarComandos(void *args);
-
+pthread_mutex_t sem;
 typedef struct SocketArgs
 {
     char *buffers;
     int port;
 } SocketArgs;
+int espera = 0;
+int frecuencia;
+void pausar()
+{
+    escribirLog("Sensor pausado");
+
+    pthread_mutex_lock(&sem);
+    espera = 1;
+    pthread_mutex_unlock(&sem);
+}
+
+void continuar()
+{
+    pthread_mutex_lock(&sem);
+    espera = 0;
+    pthread_mutex_unlock(&sem);
+    escribirLog("Sensor continuando");
+}
 
 int main(int argc, char const *argv[])
 {
+    inicializarLog((char *)argv[3]);
+    if (argv[4] != NULL)
+    {
+        frecuencia = atoi(argv[4]);
+    }
+    if (pthread_mutex_init(&sem, NULL) != 0)
+    {
+        printf("Error al iniciar semaforo\n");
+    }
+
     if (argc < 0)
     {
         fprintf(stderr, "Se necesita dos argumentos\n");
@@ -38,11 +67,13 @@ int main(int argc, char const *argv[])
     const int port = atoi(argv[2]);
 
     pthread_t tid[2];
-    pthread_create(&tid[0], NULL, solicitarComandos, NULL);
     struct SocketArgs sa;
     sa.buffers = buffers;
     sa.port = port;
+
     pthread_create(&tid[1], NULL, conexionSocket, (void *)&sa);
+    pthread_create(&tid[0], NULL, solicitarComandos, NULL);
+
     pthread_join(tid[0], NULL);
     pthread_join(tid[1], NULL);
 
@@ -58,9 +89,20 @@ void *solicitarComandos(void *args)
         scanf("%s", comando);
         if (strcmp(comando, "pausa") == 0)
         {
+            pausar();
         }
         else if (strcmp(comando, "continuar") == 0)
         {
+            continuar();
+        }
+        else if (strcmp(comando, "cerrar") == 0)
+        {
+            escribirLog("Terminado");
+            exit(0);
+        }
+        else
+        {
+            printf("Por favor ingresar comando pausa, continuar o cerrar");
         }
     }
 }
@@ -92,15 +134,18 @@ void *conexionSocket(void *args)
         printf("Conectado\n");
         while (1)
         {
-            int n = 0;
-            char info[100];
-            crearInformacion(var->buffers, info);
-            n = write(fd, info, 100);
-            if (n < 0)
+            if (espera == 0)
             {
-                printf("Error de conexion con framework");
+                int n = 0;
+                char info[100];
+                crearInformacion(var->buffers, info);
+                n = write(fd, info, 100);
+                if (n < 0)
+                {
+                    printf("Error de conexion con framework");
+                }
+                sleep(frecuencia);
             }
-            sleep(5);
         }
     }
     return NULL;

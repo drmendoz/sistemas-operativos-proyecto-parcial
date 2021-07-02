@@ -21,10 +21,9 @@ void anadirValorBuffer(Buffer *buffer, char *hora, int valor)
     {
         if (buffer->valores[i] == NULL || i == BUFF_SIZE - 1)
         {
-            struct ValorSensor *valorSensor = malloc(sizeof(*valorSensor));
-            valorSensor->hora = hora;
-            valorSensor->valor = valor;
-            buffer->valores[i] = valorSensor;
+            buffer->valores[i] = (ValorSensor *)malloc(sizeof(struct ValorSensor));
+            buffer->valores[i]->hora = hora;
+            buffer->valores[i]->valor = valor;
             break;
         }
     }
@@ -41,8 +40,11 @@ int obtenerValores(Buffer *buffer)
     {
         if (buffer->valores[i] != NULL)
         {
+
             sum += buffer->valores[i]->valor;
             cont += 1;
+            free(buffer->valores[i]);
+            buffer->valores[i] = NULL;
         }
     }
     if (cont == 0)
